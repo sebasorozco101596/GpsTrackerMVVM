@@ -1,0 +1,2 @@
+rootProject.name = "GpsTrackerMVVM"
+include ':app'
