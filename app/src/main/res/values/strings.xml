@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">GpsTrackerMVVM</string>
+    <string name="google_maps_key">AIzaSyCnVLjuVVoV41SbY_WMOI8ijXEf1nTtiQI</string>
 </resources>
