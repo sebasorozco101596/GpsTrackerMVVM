@@ -19,6 +19,7 @@ import com.sebasorozcob.www.gpstrackermvvm.util.Constants.ACTION_START_OR_RESUME
 import com.sebasorozcob.www.gpstrackermvvm.util.Constants.MAP_ZOOM
 import com.sebasorozcob.www.gpstrackermvvm.util.Constants.POLYLINE_COLOR
 import com.sebasorozcob.www.gpstrackermvvm.util.Constants.POLYLINE_WIDTH
+import com.sebasorozcob.www.gpstrackermvvm.util.TrackingUtility
 import com.sebasorozcob.www.gpstrackermvvm.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -34,6 +35,8 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
 
     private var _binding: FragmentTrackingBinding? = null
     private val binding get() = _binding!!
+
+    private var curTimeMillis = 0L
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,6 +73,12 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
             pathPoints = it
             addLatestPolyline()
             moveCameraToUser()
+        })
+
+        TrackingService.timeRunInMillis.observe(viewLifecycleOwner, {
+            curTimeMillis = it
+            val formattedTime = TrackingUtility.getFormattedStopWatchTime(curTimeMillis, true)
+            binding.tvTimer.text = formattedTime
         })
     }
 
