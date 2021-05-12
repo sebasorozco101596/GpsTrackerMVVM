@@ -9,17 +9,23 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.sebasorozcob.www.gpstrackermvvm.R
 import com.sebasorozcob.www.gpstrackermvvm.databinding.FragmentRunBinding
+import com.sebasorozcob.www.gpstrackermvvm.ui.adapters.RunAdapter
 import com.sebasorozcob.www.gpstrackermvvm.util.Constants.REQUEST_CODE_LOCATION_PERMISSION
 import com.sebasorozcob.www.gpstrackermvvm.util.TrackingUtility
 import com.sebasorozcob.www.gpstrackermvvm.viewmodels.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
 
+@AndroidEntryPoint
 class RunFragment : Fragment(R.layout.fragment_run), EasyPermissions.PermissionCallbacks {
 
     private val viewModel: MainViewModel by viewModels()
+
+    private lateinit var runAdapter: RunAdapter
 
     private var _binding: FragmentRunBinding? = null
     private val binding get() = _binding!!
@@ -36,9 +42,21 @@ class RunFragment : Fragment(R.layout.fragment_run), EasyPermissions.PermissionC
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         requestPermissions()
+        setupRecyclerView()
+
+        viewModel.runsSortedByDate.observe(viewLifecycleOwner, {
+            runAdapter.submitList(it)
+        })
+
         binding.fab.setOnClickListener {
             findNavController().navigate(R.id.action_runFragment_to_trackingFragment)
         }
+    }
+
+    private fun setupRecyclerView() = binding.rvRuns.apply {
+        runAdapter = RunAdapter()
+        adapter = runAdapter
+        layoutManager = LinearLayoutManager(requireContext())
     }
 
     private fun requestPermissions() {
