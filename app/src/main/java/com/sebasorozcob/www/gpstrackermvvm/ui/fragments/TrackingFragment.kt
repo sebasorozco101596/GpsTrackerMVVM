@@ -27,6 +27,8 @@ import com.sebasorozcob.www.gpstrackermvvm.util.TrackingUtility
 import com.sebasorozcob.www.gpstrackermvvm.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Named
 import kotlin.math.round
 
 @AndroidEntryPoint
@@ -46,7 +48,8 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
 
     private var menu: Menu? = null
 
-    private var weight = 80f
+    @set: [Inject Named("weight")]
+    var weight = 80f
 
     override fun onCreateView(
         inflater: LayoutInflater,
