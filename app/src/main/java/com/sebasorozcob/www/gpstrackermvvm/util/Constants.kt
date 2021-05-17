@@ -38,4 +38,7 @@ object Constants {
     const val NOTIFICATION_CHANNEL_NAME = "Tracking"
     const val NOTIFICATION_ID = 1 // If i put 0 as ID I gonna receive a error
 
+    // Dialogs
+    const val CANCEL_TRACKING_DIALOG_TAG = "cancelDialog"
+
 }

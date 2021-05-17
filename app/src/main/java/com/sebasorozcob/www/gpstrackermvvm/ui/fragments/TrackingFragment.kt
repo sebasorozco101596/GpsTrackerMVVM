@@ -10,16 +10,17 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.PolylineOptions
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.sebasorozcob.www.gpstrackermvvm.R
 import com.sebasorozcob.www.gpstrackermvvm.databinding.FragmentTrackingBinding
 import com.sebasorozcob.www.gpstrackermvvm.db.Run
 import com.sebasorozcob.www.gpstrackermvvm.services.Polyline
 import com.sebasorozcob.www.gpstrackermvvm.services.TrackingService
+import com.sebasorozcob.www.gpstrackermvvm.ui.dialogs.CancelTrackingDialog
 import com.sebasorozcob.www.gpstrackermvvm.util.Constants.ACTION_PAUSE_SERVICE
 import com.sebasorozcob.www.gpstrackermvvm.util.Constants.ACTION_START_OR_RESUME_SERVICE
 import com.sebasorozcob.www.gpstrackermvvm.util.Constants.ACTION_STOP_SERVICE
+import com.sebasorozcob.www.gpstrackermvvm.util.Constants.CANCEL_TRACKING_DIALOG_TAG
 import com.sebasorozcob.www.gpstrackermvvm.util.Constants.MAP_ZOOM
 import com.sebasorozcob.www.gpstrackermvvm.util.Constants.POLYLINE_COLOR
 import com.sebasorozcob.www.gpstrackermvvm.util.Constants.POLYLINE_WIDTH
@@ -73,6 +74,15 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
 
         binding.btnToggleRun.setOnClickListener {
             toggleRun()
+        }
+
+        if (savedInstanceState != null) {
+            val cancelTrackingDialog = parentFragmentManager.findFragmentByTag(
+                CANCEL_TRACKING_DIALOG_TAG
+            ) as CancelTrackingDialog?
+            cancelTrackingDialog?.setYesListener {
+                stopRun()
+            }
         }
 
         binding.mapView.getMapAsync {
@@ -133,31 +143,25 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
     }
 
     private fun showCancelTrackingDialog() {
-        val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.AlertDialogTheme)
-            .setTitle("Cancel the run?")
-            .setMessage("Are you sure to cancel the current run and delete all its data?")
-            .setIcon(R.drawable.ic_delete)
-            .setPositiveButton("Yes") { _, _ ->
+        CancelTrackingDialog().apply {
+            setYesListener {
                 stopRun()
             }
-            .setNegativeButton("No") { dialogInterface, _ ->
-                dialogInterface.cancel()
-            }
-            .create()
-        dialog.show()
+        }.show(parentFragmentManager, CANCEL_TRACKING_DIALOG_TAG)
     }
 
     private fun stopRun() {
+        binding.tvTimer.text = "00:00:00:00"
         sendCommandToService(ACTION_STOP_SERVICE)
         findNavController().navigate(R.id.action_trackingFragment_to_runFragment)
     }
 
     private fun updateTracking(isTracking: Boolean) {
         this.isTracking = isTracking
-        if (!isTracking) {
+        if (!isTracking && curTimeMillis > 0L) {
             binding.btnToggleRun.text = "Start"
             binding.btnFinishRun.visibility = View.VISIBLE
-        } else {
+        } else if (isTracking) {
             binding.btnToggleRun.text = "Stop"
             menu?.getItem(0)?.isVisible = true
             binding.btnFinishRun.visibility = View.GONE

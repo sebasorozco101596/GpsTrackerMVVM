@@ -34,6 +34,8 @@ class MainActivity : AppCompatActivity() {
                 ).findNavController()
             )
 
+            bottomNavigationView.setOnNavigationItemReselectedListener { /** NO-OPERATION */ }
+
             flFragment.findViewById<View>(
                 R.id.navHostFragment
             ).findNavController().addOnDestinationChangedListener { _, destination, _ ->
